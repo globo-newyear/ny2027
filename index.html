@@ -12,13 +12,19 @@
 :root{--red:#c8141f;--red-d:#7a0b11;--red-dd:#3d0508;--gold:#f7c948;--gold-l:#ffe9a8;--gold-d:#b07d12;--cream:#fffaf0;--ink:#5a0a0e}
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  min-height:100vh; font-family:"Sarabun","Leelawadee UI",Tahoma,sans-serif; color:var(--ink);
-  background:radial-gradient(ellipse at 50% 0%,#d01822,#8a0c13 55%,#3d0508);
-  display:flex; justify-content:center; padding:96px 16px 50px;
+  min-height:100vh; min-height:100dvh; font-family:"Sarabun","Leelawadee UI",Tahoma,sans-serif; color:var(--ink);
+  background:radial-gradient(ellipse at 50% 0%,#d01822,#8a0c13 55%,#3d0508) fixed #3d0508;
+  display:flex; justify-content:center; align-items:flex-start;
 }
+html{background:#3d0508}
+body.fit{height:100vh;height:100dvh;overflow:hidden}
+.zbtn{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:8;display:none;
+  font:inherit;font-family:"Mitr",sans-serif;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer;
+  color:var(--red-dd);background:linear-gradient(180deg,#fff3c4,#f7c948 55%,#d39b1c);border:2px solid #fff3c4;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.zbtn.show{display:block}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;
   background-image:repeating-linear-gradient(45deg,var(--gold) 0 2px,transparent 2px 26px),repeating-linear-gradient(-45deg,var(--gold) 0 2px,transparent 2px 26px)}
-.wrap{position:relative;width:100%;max-width:460px}
+.wrap{position:relative;width:100%;max-width:492px;padding:96px 16px 50px;transform-origin:top center}
 .mitr{font-family:"Mitr","Leelawadee UI",Tahoma,sans-serif}
 
 /* envelope */
@@ -110,6 +116,7 @@ canvas{position:fixed;inset:0;pointer-events:none;z-index:9}
 
   <div class="err" id="err" style="display:none"><b>ไม่พบคำอวยพร</b>กรุณาสแกน QR Code จากบอร์ดเซียมซีอีกครั้งนะครับ 🧧</div>
 </div>
+<button class="zbtn" id="zoomBtn">🔍 ขยายอ่าน</button>
 <canvas id="fx"></canvas>
 
 <script>
@@ -136,9 +143,29 @@ else{
   document.getElementById('poem').innerHTML = html.join('');
   env.addEventListener('click', open, {once:true});
 }
+/* ย่อการ์ดให้พอดีหน้าจอ (ไม่ต้องเลื่อน) — กด "ขยายอ่าน" เพื่อดูขนาดเต็ม หรือใช้นิ้วถ่างซูมได้ */
+let fitMode = true;
+const wrapEl = document.querySelector('.wrap'), zoomBtn = document.getElementById('zoomBtn');
+function fit(){
+  wrapEl.style.transform=''; wrapEl.style.marginTop='0px';
+  if (!card.classList.contains('show')) return;
+  const h = wrapEl.offsetHeight, vh = window.innerHeight;
+  if (fitMode){
+    const sc = Math.min(1, vh / h);
+    wrapEl.style.transform = `scale(${sc})`;
+    wrapEl.style.marginTop = Math.max(0, (vh - h*sc) / 2) + 'px';
+    document.body.classList.add('fit');
+  } else {
+    document.body.classList.remove('fit');
+  }
+  zoomBtn.textContent = fitMode ? '🔍 ขยายอ่าน' : '📱 พอดีจอ';
+}
+zoomBtn.addEventListener('click', ()=>{ fitMode = !fitMode; fit(); if(!fitMode) window.scrollTo(0,0); });
+addEventListener('resize', fit);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 function open(){
   env.classList.add('open');
-  setTimeout(()=>{ env.style.display='none'; card.classList.add('show'); confetti(); }, 550);
+  setTimeout(()=>{ env.style.display='none'; card.classList.add('show'); zoomBtn.classList.add('show'); fit(); confetti(); }, 550);
 }
 
 /* confetti */
