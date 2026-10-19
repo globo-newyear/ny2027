@@ -116,7 +116,6 @@ canvas{position:fixed;inset:0;pointer-events:none;z-index:9}
 
   <div class="err" id="err" style="display:none"><b>ไม่พบคำอวยพร</b>กรุณาสแกน QR Code จากบอร์ดเซียมซีอีกครั้งนะครับ 🧧</div>
 </div>
-<button class="zbtn" id="zoomBtn">🔍 ขยายอ่าน</button>
 <canvas id="fx"></canvas>
 
 <script>
@@ -143,9 +142,9 @@ else{
   document.getElementById('poem').innerHTML = html.join('');
   env.addEventListener('click', open, {once:true});
 }
-/* ย่อการ์ดให้พอดีหน้าจอ (ไม่ต้องเลื่อน) — กด "ขยายอ่าน" เพื่อดูขนาดเต็ม หรือใช้นิ้วถ่างซูมได้ */
+/* ย่อการ์ดให้พอดีหน้าจอ (ไม่ต้องเลื่อน) — ใช้นิ้วถ่างซูมเพื่อขยายอ่านได้ */
 let fitMode = true;
-const wrapEl = document.querySelector('.wrap'), zoomBtn = document.getElementById('zoomBtn');
+const wrapEl = document.querySelector('.wrap');
 function fit(){
   wrapEl.style.transform=''; wrapEl.style.marginTop='0px';
   if (!card.classList.contains('show')) return;
@@ -158,14 +157,12 @@ function fit(){
   } else {
     document.body.classList.remove('fit');
   }
-  zoomBtn.textContent = fitMode ? '🔍 ขยายอ่าน' : '📱 พอดีจอ';
 }
-zoomBtn.addEventListener('click', ()=>{ fitMode = !fitMode; fit(); if(!fitMode) window.scrollTo(0,0); });
 addEventListener('resize', fit);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 function open(){
   env.classList.add('open');
-  setTimeout(()=>{ env.style.display='none'; card.classList.add('show'); zoomBtn.classList.add('show'); fit(); confetti(); }, 550);
+  setTimeout(()=>{ env.style.display='none'; card.classList.add('show'); fit(); confetti(); }, 550);
 }
 
 /* confetti */
